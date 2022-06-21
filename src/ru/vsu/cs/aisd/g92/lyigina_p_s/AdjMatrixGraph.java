@@ -113,4 +113,12 @@ public class AdjMatrixGraph implements Graph {
     public boolean isAdj(int v1, int v2) {
         return adjMatrix[v1][v2];
     }
+
+    @Override
+    public int getAdjCount(int v) {
+        int res = 0;
+        for (int i : adjacencies(v))
+            res++;
+        return res;
+    }
 }

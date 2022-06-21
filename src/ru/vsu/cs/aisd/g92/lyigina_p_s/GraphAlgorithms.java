@@ -243,4 +243,147 @@ public class GraphAlgorithms {
         result.from = from;
         return result;
     }
+
+    private static boolean check(List<Integer> list, int k) {
+        int mx = 0, mn = Integer.MAX_VALUE;
+        for (int i = 0; i < list.size()-1; i++) {
+            mn = Math.min(list.get(i), mn);
+            mx = Math.max(list.get(i), mx);
+        }
+        return mx <= mn*k;
+    }
+
+    private static boolean hasFriends(Graph graph, int teamNum, int v, int[] res) {
+        for (int i = 0; i < graph.vertexCount(); i++) {
+            if (res[i] == teamNum && graph.isAdj(i, v)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static void splitAlg(Graph graph, int[] res, int teamNum, int currTeam) {
+        Queue<Integer> queue = new LinkedList<>();
+        int maxAdjCountV1 = -1, maxAdjCountV2 = -1;
+
+        for (int i = 0; i < graph.vertexCount(); i++) {
+            if (res[i] == teamNum) {
+                queue.add(i);
+                res[i] = -1;
+                if (maxAdjCountV1 == -1 || graph.getAdjCount(i) > graph.getAdjCount(maxAdjCountV1)){
+                    maxAdjCountV2 = maxAdjCountV1;
+                    maxAdjCountV1 = i;
+                } else if (maxAdjCountV2 == -1 || graph.getAdjCount(i) > graph.getAdjCount(maxAdjCountV2))
+                    maxAdjCountV2 = i;
+            }
+        }
+        boolean v1, v2;
+        v1 = queue.remove(maxAdjCountV1);
+        v2 = queue.remove(maxAdjCountV2);
+        if (!v1){
+            res[maxAdjCountV2] = teamNum;
+            return;
+        }
+        if (!v2){
+            res[maxAdjCountV1] = teamNum;
+            return;
+        }
+
+        int oldTeamSize = 1, newTeamSize = 1;
+        res[maxAdjCountV2] = currTeam;
+        res[maxAdjCountV1] = teamNum;
+        while (!queue.isEmpty()) {
+            int v = queue.poll();
+            if (newTeamSize <= oldTeamSize) {
+                if (hasFriends(graph, currTeam, v, res)) {
+                    res[v] = currTeam;
+                    newTeamSize++;
+                } else if (hasFriends(graph, teamNum, v, res)) {
+                    res[v] = teamNum;
+                    oldTeamSize++;
+                } else
+                    queue.add(v);
+            } else {
+                if (hasFriends(graph, teamNum, v, res)) {
+                    res[v] = teamNum;
+                    oldTeamSize++;
+                } else if (hasFriends(graph, currTeam, v, res)) {
+                    res[v] = currTeam;
+                    newTeamSize++;
+                } else
+                    queue.add(v);
+            }
+        }
+    }
+
+    private static int[] split(Graph graph, int[] teams, int teamNum,
+                               int currTeam, int m, int k, boolean first) {
+        int[] res = teams.clone();
+        if (!first) {
+            splitAlg(graph, res, teamNum, currTeam);
+            currTeam++;
+        }
+
+        //
+        if (currTeam-1 != m) {
+            int[] res1 = res.clone();
+            for (int i = 1; i < currTeam; i++) {
+                res = split(graph, res1, i, currTeam, m, k, false);
+                if (res != null)
+                    break;
+            }
+        } else if (res != null) {
+            List<Integer> teamSize = new ArrayList<>();
+            for (int i = 0; i < currTeam; i++){
+                teamSize.add(0);
+            }
+            for (int i : res){
+                teamSize.set(i-1, teamSize.get(i-1)+1);
+            }
+            if (check(teamSize, k))
+                return res;
+            else
+                return null;
+        }
+        return res;
+    }
+
+    public static int[] connectedTeams(Graph graph, int m, int k) {
+        int n = graph.vertexCount();
+        if (m > n)
+            return null;
+        int[] teams = new int[n];
+        List<Integer> teamSize = new ArrayList<>();
+        teamSize.add(0);
+        int currTeam = 1;
+        for (int v1 = 0; v1 < n; v1++) {
+            if (teams[v1] == 0) {
+                for (int v2 : dfs(graph, v1)) {
+                    teams[v2] = currTeam;
+                    teamSize.set(currTeam-1, teamSize.get(currTeam-1)+1);
+                }
+                currTeam++;
+                teamSize.add(0);
+            }
+        }
+
+        if (currTeam-1 > m)
+            return null;
+        if (currTeam-1 == m) {
+            if (!check(teamSize, k))
+                return null;
+        } else {
+            teams = split(graph, teams, 1, currTeam, m, k, true);
+        }
+        return teams;
+    }
+
+    public static int[] completeTeams(Graph graph, int m, int k) {
+        int n = graph.vertexCount();
+        if (m > n)
+            return null;
+        int[] teams = new int[n];
+
+        return teams;
+    }
 }

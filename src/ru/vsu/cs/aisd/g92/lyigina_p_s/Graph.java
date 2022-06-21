@@ -51,4 +51,6 @@ public interface Graph {
         }
         return false;
     }
+
+    int getAdjCount(int v);
 }

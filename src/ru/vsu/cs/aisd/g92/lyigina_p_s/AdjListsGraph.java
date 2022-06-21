@@ -88,4 +88,7 @@ public class AdjListsGraph implements Graph {
     public Iterable<Integer> adjacencies(int v) {
         return vAdjLists.get(v) == null ? nullIterable : vAdjLists.get(v);
     }
+
+    @Override
+    public int getAdjCount(int v){return vAdjLists.get(v).size();}
 }

@@ -106,7 +106,7 @@ public class GraphUtils {
 
 
     /**
-     * Получение dot-описяния графа (для GraphViz)
+     * Получение dot-описания графа (для GraphViz)
      * @return
      */
     public static String toDot(Graph graph) {

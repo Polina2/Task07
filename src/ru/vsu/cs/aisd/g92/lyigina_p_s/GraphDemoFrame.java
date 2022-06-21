@@ -22,6 +22,8 @@ import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
 import java.io.*;
 import java.lang.reflect.Method;
@@ -62,6 +64,9 @@ public class GraphDemoFrame extends JFrame {
     private JButton buttonSaveDotSvgToFile;
     private JComboBox comboBoxExample;
     private JButton buttonExampleExec;
+    private JButton buttonConnectedTeams;
+    private JTextField textFieldK;
+    private JTextField textFieldM;
 
     private JFileChooser fileChooserTxtOpen;
     private JFileChooser fileChooserDotOpen;
@@ -374,6 +379,12 @@ public class GraphDemoFrame extends JFrame {
                 } catch (Exception exc) {
                     SwingUtils.showErrorMessageBox(exc);
                 }
+            }
+        });
+        buttonConnectedTeams.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int[] ans = GraphAlgorithms.connectedTeams(graph, Integer.parseInt(textFieldM.getText()), Integer.parseInt(textFieldK.getText()));
             }
         });
     }
