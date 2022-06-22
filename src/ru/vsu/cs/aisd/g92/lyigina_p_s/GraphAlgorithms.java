@@ -378,12 +378,161 @@ public class GraphAlgorithms {
         return teams;
     }
 
+    private static void bronKerbosch(Graph graph, Set<Integer> maxGr, Set<Integer> candidates, Set<Integer> not, List<Set<Integer>> ans) {
+        if (candidates.isEmpty() && not.isEmpty()) {
+            ans.add(maxGr);
+            return;
+        }
+        Set<Integer> candidates1 = new HashSet<>(candidates);
+        for (int v : candidates1) {
+            Set<Integer> newMaxGr = new HashSet<>(maxGr), newCandidates = new HashSet<>(candidates),
+            newNot = new HashSet<>(not);
+            newMaxGr.add(v);
+            Set<Integer> delete = new HashSet<>();
+            for (int c : newCandidates) {
+                if (!graph.isAdj(c, v))
+                    delete.add(c);
+            }
+            newCandidates.removeAll(delete);
+            delete.clear();
+            for (int n : newNot) {
+                if (!graph.isAdj(n, v))
+                    delete.add(n);
+            }
+            newNot.removeAll(delete);
+            bronKerbosch(graph, newMaxGr, newCandidates, newNot, ans);
+            candidates.remove(v);
+            not.add(v);
+        }
+    }
+
+    private static void halve(List<Set<Integer>> teams) {
+        Set<Integer> maxTeam = teams.get(0);
+        for (Set<Integer> set : teams) {
+            if (set.size() > maxTeam.size())
+                maxTeam = set;
+        }
+        Set<Integer> newTeam = new HashSet<>();
+        for (int p : maxTeam){
+            if (Math.abs(newTeam.size() - maxTeam.size()) <= 1)
+                break;
+            newTeam.add(p);
+            //maxTeam.remove(p);
+        }
+        maxTeam.removeAll(newTeam);
+        teams.add(newTeam);
+    }
+/*
+    private static void moveMembers(Graph graph, List<Set<Integer>> teams) {
+        for (int set1 = 0; set1 < teams.size(); set1++) {
+            for (int set2 = 0; set2 < teams.size(); set2++) {
+                if (teams.get(set1).size() < 2 || set1==set2)
+                    break;
+                Set<Integer> move = new HashSet<>();
+                for (int v1 : teams.get(set1)) {
+                    boolean f = false;
+                    for (int v2 : teams.get(set2)) {
+                        if (!graph.isAdj(v1, v2)) {
+                            f = true;
+                            break;
+                        }
+                    }
+                    if (!f) {
+                        move.add(v1);
+                    }
+                }
+                teams.get(set2).addAll(move);
+                teams.get(set1).removeAll(move);
+                if (!move.isEmpty()) {
+                    move.clear();
+                    break;
+                }
+            }
+        }
+    }
+*/
+
+    private static void moveMembers(Graph graph, List<Set<Integer>> teams) {
+        Set<Integer> maxTeam = teams.get(0);
+        for (Set<Integer> set : teams) {
+            if (set.size() > maxTeam.size())
+                maxTeam = set;
+        }
+        int p1 = -1, p2 = -1;
+        for (int v1 : maxTeam) {
+            for (int v2 : graph.adjacencies(v1)) {
+                if (!maxTeam.contains(v2)) {
+                    p1 = v1; p2 = v2;
+                }
+            }
+        }
+        for (Set<Integer> set : teams) {
+            if (set.contains(p2)) {
+                set.add(p1);
+                maxTeam.remove(p1);
+                break;
+            }
+        }
+    }
+
     public static int[] completeTeams(Graph graph, int m, int k) {
         int n = graph.vertexCount();
         if (m > n)
             return null;
         int[] teams = new int[n];
 
-        return teams;
+        Set<Integer> vertexes = new HashSet<>();
+        for (int i = 0; i < n; i++) {
+            vertexes.add(i);
+        }
+        List<Set<Integer>> maxGraphs = new ArrayList<>();
+        bronKerbosch(graph, new HashSet<>(), vertexes, new HashSet<>(), maxGraphs);
+
+        List<Set<Integer>> maxTeams = new ArrayList<>();
+        while (!maxGraphs.isEmpty()) {
+            Set<Integer> maxGr = new HashSet<>(maxGraphs.get(0));
+            for (Set<Integer> set : maxGraphs) {
+                if (set.size() > maxGr.size()) {
+                    maxGr.clear();
+                    maxGr.addAll(set);
+                }
+            }
+            List<Set<Integer>> delete = new ArrayList<>();
+            for (Set<Integer> set : maxGraphs) {
+                set.removeAll(maxGr);
+                if (set.isEmpty())
+                    delete.add(set);
+            }
+            maxTeams.add(maxGr);
+            maxGraphs.removeAll(delete);
+            //maxGraphs.remove(maxGr);
+        }
+
+        if (maxTeams.size() > m)
+            return null;
+        while (maxTeams.size() < m) {
+            halve(maxTeams);
+        }
+        List<Integer> teamSize = new ArrayList<>(maxTeams.size());
+        for (Set<Integer> set : maxTeams) {
+            teamSize.add(set.size());
+        }
+        int count = 5;
+        while (!check(teamSize, k) && count != 0) {
+            moveMembers(graph, maxTeams);
+            for (int set = 0; set < maxTeams.size(); set++) {
+                teamSize.set(set, maxTeams.get(set).size());
+            }
+            count--;
+        }
+        if (check(teamSize, k)) {
+            for (int i = 0; i < maxTeams.size(); i++) {
+                for (int p : maxTeams.get(i)) {
+                    teams[p] = i + 1;
+                }
+            }
+            return teams;
+        } else
+            return null;
     }
 }

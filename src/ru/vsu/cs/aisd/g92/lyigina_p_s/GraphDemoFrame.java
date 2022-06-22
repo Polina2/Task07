@@ -67,6 +67,7 @@ public class GraphDemoFrame extends JFrame {
     private JButton buttonConnectedTeams;
     private JTextField textFieldK;
     private JTextField textFieldM;
+    private JButton buttonCompleteTeams;
 
     private JFileChooser fileChooserTxtOpen;
     private JFileChooser fileChooserDotOpen;
@@ -385,6 +386,12 @@ public class GraphDemoFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int[] ans = GraphAlgorithms.connectedTeams(graph, Integer.parseInt(textFieldM.getText()), Integer.parseInt(textFieldK.getText()));
+            }
+        });
+        buttonCompleteTeams.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int[] ans = GraphAlgorithms.completeTeams(graph, Integer.parseInt(textFieldM.getText()), Integer.parseInt(textFieldK.getText()));
             }
         });
     }
