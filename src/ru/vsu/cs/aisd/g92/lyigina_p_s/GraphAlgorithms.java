@@ -281,7 +281,8 @@ public class GraphAlgorithms {
         v1 = queue.remove(maxAdjCountV1);
         v2 = queue.remove(maxAdjCountV2);
         if (!v1){
-            res[maxAdjCountV2] = teamNum;
+            if (v2)
+                res[maxAdjCountV2] = teamNum;
             return;
         }
         if (!v2){
@@ -422,35 +423,6 @@ public class GraphAlgorithms {
         maxTeam.removeAll(newTeam);
         teams.add(newTeam);
     }
-/*
-    private static void moveMembers(Graph graph, List<Set<Integer>> teams) {
-        for (int set1 = 0; set1 < teams.size(); set1++) {
-            for (int set2 = 0; set2 < teams.size(); set2++) {
-                if (teams.get(set1).size() < 2 || set1==set2)
-                    break;
-                Set<Integer> move = new HashSet<>();
-                for (int v1 : teams.get(set1)) {
-                    boolean f = false;
-                    for (int v2 : teams.get(set2)) {
-                        if (!graph.isAdj(v1, v2)) {
-                            f = true;
-                            break;
-                        }
-                    }
-                    if (!f) {
-                        move.add(v1);
-                    }
-                }
-                teams.get(set2).addAll(move);
-                teams.get(set1).removeAll(move);
-                if (!move.isEmpty()) {
-                    move.clear();
-                    break;
-                }
-            }
-        }
-    }
-*/
 
     private static void moveMembers(Graph graph, List<Set<Integer>> teams) {
         Set<Integer> maxTeam = teams.get(0);
@@ -535,4 +507,36 @@ public class GraphAlgorithms {
         } else
             return null;
     }
+
+    public static String randomGraph(int v) {
+        StringBuilder gr = new StringBuilder();
+        Random rand = new Random();
+        int e = rand.nextInt(v)+v;
+        gr.append(v).append("\n").append(e).append("\n");
+        for (int i = 0; i < v; i++){
+            int v2 = rand.nextInt(v);
+            if (v2 == i)
+                v2 = (v2+1)%v;
+            gr.append(i).append(" ").append(v2).append("\n");
+        }
+        for (int i = 0; i < e; i++) {
+            int v1 = rand.nextInt(v);
+            int v2 = rand.nextInt(v);
+            if (v2 == v1)
+                v2 = (v2+1)%v;
+            gr.append(v1).append(" ").append(v2).append("\n");
+        }
+        return gr.toString();
+    }
+
+    public static String dotColors(String dot, int[] teams) {
+        StringBuilder sb = new StringBuilder();
+        int start = dot.indexOf('{')+1;
+        String[] colors = {"red", "blue", "yellow", "green", "pink", "black", "violet", "cyan", "orange"};
+        for (int i = 0; i < teams.length; i++) {
+            sb.append(i).append(" [color=").append(colors[(teams[i]-1)%colors.length]).append("]\n");
+        }
+        return dot.substring(0, start+1) + sb + dot.substring(start+1);
+    }
+
 }

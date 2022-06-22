@@ -7,13 +7,13 @@
 <g id="node1" class="node">
 <title>a</title>
 <ellipse fill="none" stroke="#ff0000" cx="27" cy="-90" rx="27" ry="18"/>
-<text text-anchor="middle" x="27" y="-86.3" font-family="Times,serif" font-size="14.00" fill="#000000">a</text>
+<text text-anchor="middle" x="27" y="-85.8" font-family="Times,serif" font-size="14.00" fill="#000000">a</text>
 </g>
 <!-- b -->
 <g id="node2" class="node">
 <title>b</title>
 <ellipse fill="none" stroke="#000000" cx="27" cy="-18" rx="27" ry="18"/>
-<text text-anchor="middle" x="27" y="-14.3" font-family="Times,serif" font-size="14.00" fill="#000000">b</text>
+<text text-anchor="middle" x="27" y="-13.8" font-family="Times,serif" font-size="14.00" fill="#000000">b</text>
 </g>
 <!-- a&#45;&gt;b -->
 <g id="edge1" class="edge">

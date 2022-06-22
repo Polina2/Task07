@@ -68,6 +68,7 @@ public class GraphDemoFrame extends JFrame {
     private JTextField textFieldK;
     private JTextField textFieldM;
     private JButton buttonCompleteTeams;
+    private JButton buttonRandom;
 
     private JFileChooser fileChooserTxtOpen;
     private JFileChooser fileChooserDotOpen;
@@ -386,12 +387,38 @@ public class GraphDemoFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int[] ans = GraphAlgorithms.connectedTeams(graph, Integer.parseInt(textFieldM.getText()), Integer.parseInt(textFieldK.getText()));
+                try {
+                    if (ans == null)
+                        textAreaSystemOut.setText("solution not found");
+                    else {
+                        panelGraphPainter.paint(dotToSvg(GraphAlgorithms.dotColors(GraphUtils.toDot(graph), ans)));
+                        textAreaSystemOut.setText("");
+                    }
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
             }
         });
         buttonCompleteTeams.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int[] ans = GraphAlgorithms.completeTeams(graph, Integer.parseInt(textFieldM.getText()), Integer.parseInt(textFieldK.getText()));
+                try {
+                    if (ans == null)
+                        textAreaSystemOut.setText("solution not found");
+                    else {
+                        panelGraphPainter.paint(dotToSvg(GraphAlgorithms.dotColors(GraphUtils.toDot(graph), ans)));
+                        textAreaSystemOut.setText("");
+                    }
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+        buttonRandom.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                textAreaGraphFile.setText(GraphAlgorithms.randomGraph(30));
             }
         });
     }
