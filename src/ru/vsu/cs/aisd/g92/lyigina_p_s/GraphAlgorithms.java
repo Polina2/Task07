@@ -262,6 +262,18 @@ public class GraphAlgorithms {
         return false;
     }
 
+    private static int getDegree(Graph graph, int v, boolean first, int[] teams) {
+        int res = 0;
+        for (int i : graph.adjacencies(v)) {
+            if (teams[i] == teams[v]) {
+                res++;
+                if (first)
+                    res += getDegree(graph, i, false, teams);
+            }
+        }
+        return res;
+    }
+
     private static void splitAlg(Graph graph, int[] res, int teamNum, int currTeam) {
         Queue<Integer> queue = new LinkedList<>();
         int maxAdjCountV1 = -1, maxAdjCountV2 = -1;
@@ -270,10 +282,11 @@ public class GraphAlgorithms {
             if (res[i] == teamNum) {
                 queue.add(i);
                 res[i] = -1;
-                if (maxAdjCountV1 == -1 || graph.getAdjCount(i) > graph.getAdjCount(maxAdjCountV1)){
+                int iCount = getDegree(graph, i, true, res);
+                if (maxAdjCountV1 == -1 || iCount > getDegree(graph, maxAdjCountV1, true, res)){
                     maxAdjCountV2 = maxAdjCountV1;
                     maxAdjCountV1 = i;
-                } else if (maxAdjCountV2 == -1 || graph.getAdjCount(i) > graph.getAdjCount(maxAdjCountV2))
+                } else if (maxAdjCountV2 == -1 || iCount > getDegree(graph, maxAdjCountV2, true, res))
                     maxAdjCountV2 = i;
             }
         }
@@ -440,7 +453,7 @@ public class GraphAlgorithms {
         }
         for (Set<Integer> set : teams) {
             if (set.contains(p2)) {
-                set.add(p1);
+                set.add(p1);//check if p1 knows everyone in set
                 maxTeam.remove(p1);
                 break;
             }
@@ -532,7 +545,7 @@ public class GraphAlgorithms {
     public static String dotColors(String dot, int[] teams) {
         StringBuilder sb = new StringBuilder();
         int start = dot.indexOf('{')+1;
-        String[] colors = {"red", "blue", "yellow", "green", "pink", "black", "violet", "cyan", "orange"};
+        String[] colors = {"red", "blue", "yellow", "green", "magenta", "black", "brown", "cyan", "orange"};
         for (int i = 0; i < teams.length; i++) {
             sb.append(i).append(" [color=").append(colors[(teams[i]-1)%colors.length]).append("]\n");
         }
